@@ -1,0 +1,13 @@
+{
+  "name": "startech-clone",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "cd server && go run ./cmd/api",
+    "seed": "cd server && go run ./cmd/seed",
+    "build:client": "npm --prefix client run build",
+    "build:server": "cd server && go build -o bin/api ./cmd/api"
+  },
+  "devDependencies": { "concurrently": "^8.2.2" }
+}

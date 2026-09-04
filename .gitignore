@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Binaries & Executables
+bin/
+*.exe
+*.exe;
+*.dll
+*.so
+*.dylib
+
+# Environment & Credentials
+.env
+.env.local
+server/.env
+
+# Logs
+*.log
+server.log
+
+# System & IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
