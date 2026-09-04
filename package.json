@@ -2,6 +2,7 @@
   "name": "startech-clone",
   "private": true,
   "scripts": {
+    "start": "npm run dev",
     "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
     "dev:client": "npm --prefix client run dev",
     "dev:server": "cd server && go run ./cmd/api",
