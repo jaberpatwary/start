@@ -20,7 +20,7 @@ func Load() (*Config, error) {
 
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://postgres:postgres@localhost:5432/startech?sslmode=disable"
+		dbURL = "postgres://postgres:root@localhost:5432/startech?sslmode=disable"
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")

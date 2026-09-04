@@ -23,11 +23,11 @@ func Seed(db *gorm.DB) error {
 	log.Println("Seeding database...")
 
 	// --- Admin User ---
-	hash, _ := bcrypt.GenerateFromPassword([]byte("Admin@123"), bcrypt.DefaultCost)
+	hash, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
 	admin := models.User{
 		ID:           uuid.NewString(),
 		Name:         "StarTech Admin",
-		Email:        "admin@startech.local",
+		Email:        "admin",
 		Phone:        "01700000001",
 		PasswordHash: string(hash),
 		Role:         models.RoleAdmin,

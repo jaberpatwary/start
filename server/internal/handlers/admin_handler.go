@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"encoding/json"
 	"math"
 	"net/http"
 	"strconv"
 
 	"github.com/jaberpatwary/startech/internal/models"
 	"github.com/labstack/echo/v4"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -153,3 +155,64 @@ func (h *AdminHandler) GetInventory(c echo.Context) error {
 	h.DB.Preload("Category").Preload("Brand").Order("stock ASC").Find(&products)
 	return c.JSON(http.StatusOK, echo.Map{"code": 200, "status": "success", "products": products})
 }
+
+func (h *AdminHandler) GetReports(c echo.Context) error {
+	type SalesSummary struct {
+		TotalOrders   int64 `json:"total_orders"`
+		TotalRevenue  int64 `json:"total_revenue"`
+		TotalProducts int64 `json:"total_products"`
+		TotalUsers    int64 `json:"total_users"`
+	}
+	var summary SalesSummary
+	h.DB.Model(&models.Order{}).Count(&summary.TotalOrders)
+	h.DB.Model(&models.Order{}).Where("payment_status = ?", models.PaymentPaid).
+		Select("COALESCE(SUM(total), 0)").Scan(&summary.TotalRevenue)
+	h.DB.Model(&models.Product{}).Count(&summary.TotalProducts)
+	h.DB.Model(&models.User{}).Where("role = ?", models.RoleUser).Count(&summary.TotalUsers)
+
+	// Top selling products
+	var topProducts []models.Product
+	h.DB.Preload("Category").Preload("Brand").Order("sold DESC").Limit(5).Find(&topProducts)
+
+	// Category sales breakdown
+	type CatSales struct {
+		CategoryName string `json:"category_name"`
+		Count        int64  `json:"count"`
+	}
+	var catSales []CatSales
+	h.DB.Table("categories").
+		Select("categories.name as category_name, COUNT(products.id) as count").
+		Joins("LEFT JOIN products ON products.category_id = categories.id").
+		Group("categories.name").Scan(&catSales)
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"code": 200, "status": "success",
+		"summary":      summary,
+		"top_products": topProducts,
+		"cat_sales":    catSales,
+	})
+}
+
+func (h *AdminHandler) GetSettings(c echo.Context) error {
+	var settings []models.Setting
+	h.DB.Find(&settings)
+	settingsMap := echo.Map{}
+	for _, s := range settings {
+		settingsMap[s.Key] = s.Value
+	}
+	return c.JSON(http.StatusOK, echo.Map{"code": 200, "status": "success", "settings": settingsMap})
+}
+
+func (h *AdminHandler) UpdateSettings(c echo.Context) error {
+	var input map[string]interface{}
+	if err := c.Bind(&input); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid input")
+	}
+	for k, v := range input {
+		vBytes, _ := json.Marshal(v)
+		setting := models.Setting{Key: k, Value: datatypes.JSON(vBytes)}
+		h.DB.Save(&setting)
+	}
+	return c.JSON(http.StatusOK, echo.Map{"code": 200, "status": "success", "message": "Settings updated"})
+}
+

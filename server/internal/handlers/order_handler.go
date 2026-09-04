@@ -233,3 +233,15 @@ func (h *OrderHandler) UpdateOrderStatus(c echo.Context) error {
 	h.DB.Save(&order)
 	return c.JSON(http.StatusOK, echo.Map{"code": 200, "status": "success", "order": order})
 }
+
+func (h *OrderHandler) TrackOrderByNumber(c echo.Context) error {
+	number := c.Param("number")
+	var order models.Order
+	if err := h.DB.Preload("Items").
+		Where("order_number = ? OR tracking_number = ?", number, number).
+		First(&order).Error; err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Order not found with that order or tracking number")
+	}
+	return c.JSON(http.StatusOK, echo.Map{"code": 200, "status": "success", "order": order})
+}
+

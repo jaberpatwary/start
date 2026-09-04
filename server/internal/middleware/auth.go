@@ -64,7 +64,9 @@ func JWTAuth() echo.MiddlewareFunc {
 				tokenStr = strings.TrimPrefix(auth, "Bearer ")
 			}
 			if tokenStr == "" {
-				tokenStr = c.Request().CookieValue("auth_token")
+				if cookie, err := c.Cookie("auth_token"); err == nil && cookie.Value != "" {
+					tokenStr = cookie.Value
+				}
 			}
 			if tokenStr == "" {
 				return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid token")

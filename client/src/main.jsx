@@ -1,48 +1,118 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react'
+import React, { Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Link, NavLink, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Heart, Menu, Search, ShoppingCart, User, X, ChevronRight, Minus, Plus, Trash2, Package, ShieldCheck, Truck, Star, LayoutDashboard, Settings, Tag, Users, Boxes, ClipboardList } from 'lucide-react'
-import { Toaster, toast } from 'react-hot-toast'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import './styles.css'
 
-const products = [
-  ['Asus ROG Strix G16 Gaming Laptop','asus-rog-strix-g16','Laptop','Asus',189900,6,'Intel Core i7, RTX 4060, 16GB RAM'],
-  ['HP Pavilion 15 Core i5 Laptop','hp-pavilion-15','Laptop','HP',82500,12,'Core i5 13th Gen, 8GB RAM, 512GB SSD'],
-  ['Dell Inspiron 15 3530','dell-inspiron-3530','Laptop','Dell',74500,9,'Core i5, FHD display, 512GB SSD'],
-  ['Lenovo LOQ 15IRX9','lenovo-loq-15','Laptop','Lenovo',119500,7,'Core i5 13th Gen, RTX 4050'],
-  ['MSI Modern 14 C13M','msi-modern-14','Laptop','MSI',66900,14,'Core i5, 16GB RAM, 512GB SSD'],
-  ['Corsair Vengeance Gaming PC','corsair-vengeance-pc','Desktop','Corsair',162000,5,'Core i7, RTX 4060 Ti, 32GB DDR5'],
-  ['Gigabyte AORUS Elite Desktop','gigabyte-aorus-desktop','Desktop','Gigabyte',148500,8,'Core i5, RTX 4060, 16GB DDR5'],
-  ['Asus ExpertCenter D5','asus-expertcenter-d5','Desktop','Asus',79500,15,'Core i5, 8GB, 512GB SSD'],
-  ['Samsung Odyssey G5 27 inch','samsung-odyssey-g5','Monitor','Samsung',38500,16,'27 inch QHD, 165Hz curved gaming'],
-  ['MSI G244F E2 Gaming Monitor','msi-g244f-e2','Monitor','MSI',21500,20,'23.8 inch IPS, 180Hz, 1ms'],
-  ['Asus TUF VG249Q3A Monitor','asus-tuf-vg249q3a','Monitor','Asus',25500,10,'24 inch IPS, 180Hz'],
-  ['Samsung ViewFinity S6 Monitor','samsung-viewfinity-s6','Monitor','Samsung',49500,6,'32 inch QHD USB-C monitor'],
-  ['Corsair Vengeance 16GB DDR5','corsair-vengeance-ddr5','Component','Corsair',6800,30,'5600MHz desktop memory'],
-  ['Gigabyte RTX 4060 Windforce','gigabyte-rtx-4060','Component','Gigabyte',49500,4,'8GB GDDR6 graphics card'],
-  ['MSI B760M Mortar WiFi','msi-b760m-mortar','Component','MSI',24500,11,'Intel LGA1700 motherboard'],
-  ['Samsung 990 EVO 1TB SSD','samsung-990-evo','Component','Samsung',10500,25,'NVMe PCIe 4.0 SSD']
-].map((p, i) => ({ id: String(i + 1), name:p[0], slug:p[1], category:p[2], brand:p[3], price:p[4], stock:p[5], shortDescription:p[6], rating:4.5, image:`https://placehold.co/600x600/f8fafc/e63946?text=${encodeURIComponent(p[0])}`, featured:i<8, sold:20+i*7 }))
-const cats = ['Desktop','Laptop','Component','Monitor']
-const Store = createContext()
-function reducer(s,a){ if(a.type==='ADD') { const item=s.cart.find(x=>x.id===a.p.id); return {...s,cart:item?s.cart.map(x=>x.id===a.p.id?{...x,quantity:x.quantity+1}:x):[...s.cart,{...a.p,quantity:1}]}} if(a.type==='QTY') return {...s,cart:s.cart.map(x=>x.id===a.id?{...x,quantity:Math.max(1,a.q)}:x)}; if(a.type==='REMOVE')return {...s,cart:s.cart.filter(x=>x.id!==a.id)}; if(a.type==='WISH')return {...s,wishlist:s.wishlist.some(x=>x.id===a.p.id)?s.wishlist.filter(x=>x.id!==a.p.id):[...s.wishlist,a.p]}; return s }
-function StoreProvider({children}) { const [state,dispatch]=useReducer(reducer, JSON.parse(localStorage.getItem('startech-store')||'{"cart":[],"wishlist":[]}')); useEffect(()=>localStorage.setItem('startech-store',JSON.stringify(state)),[state]); return <Store.Provider value={{...state,dispatch}}>{children}</Store.Provider> }
-const useStore=()=>useContext(Store); const money=n=>`৳${n.toLocaleString()}`
-function Header(){const {cart,wishlist}=useStore(),[open,setOpen]=useState(false),[q,setQ]=useState('');const nav=useNavigate(); return <><header><Link className="logo" to="/">Star<span>Tech</span> Clone</Link><button className="mobile-menu" onClick={()=>setOpen(!open)}><Menu/></button><nav className={open?'open':''}>{cats.map(c=><NavLink key={c} to={`/category/${c.toLowerCase()}`}>{c}</NavLink>)}</nav><form className="search" onSubmit={e=>{e.preventDefault();nav(`/search?q=${q}`)}}><Search size={18}/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search products..."/></form><div className="actions"><Link to="/wishlist"><Heart/><b>{wishlist.length}</b></Link><Link to="/cart"><ShoppingCart/><b>{cart.reduce((n,x)=>n+x.quantity,0)}</b></Link><Link to="/account"><User/></Link></div></header></>}
-function ProductCard({p}){const {dispatch,wishlist}=useStore();return <article className="product-card"><button className="heart" onClick={()=>{dispatch({type:'WISH',p});toast.success('Wishlist updated')}}><Heart fill={wishlist.some(x=>x.id===p.id)?'#e63946':'none'}/></button><Link to={`/product/${p.slug}`}><img src={p.image} alt=""/><small>{p.brand} · {p.category}</small><h3>{p.name}</h3><p className="rating">★★★★★ <span>({p.rating})</span></p><strong>{money(p.price)}</strong></Link><button className="add" onClick={()=>{dispatch({type:'ADD',p});toast.success('Added to cart')}}>Add to Cart</button></article>}
-function Home(){return <><section className="hero"><div><p>Bangladesh's trusted tech shop</p><h1>Upgrade your<br/><em>everyday tech.</em></h1><Link className="primary" to="/category/laptop">Shop laptops <ChevronRight/></Link></div><img src="https://placehold.co/900x460/1f2937/ffffff?text=Tech+Week+Sale" alt="Tech week sale"/></section><section className="category-row">{cats.map((c,i)=><Link to={`/category/${c.toLowerCase()}`} key={c}><span>{['🖥️','💻','⚙️','🖵'][i]}</span><b>{c}</b><small>Explore now</small></Link>)}</section><ProductSection title="Featured Products" list={products.filter(x=>x.featured)}/><section className="deal"><div><p>Limited-time offer</p><h2>Deals of the Day</h2><strong>12: 42: 08</strong><Link to="/search?q=" className="primary">View all deals</Link></div><ProductCard p={products[8]}/></section><ProductSection title="New Arrivals" list={products.slice(8)}/><section className="brands">{['Asus','HP','Dell','Lenovo','MSI','Gigabyte','Corsair','Samsung'].map(x=><b key={x}>{x}</b>)}</section></>}
-function ProductSection({title,list}){return <section><div className="section-title"><h2>{title}</h2><Link to="/search?q=">View all <ChevronRight/></Link></div><div className="grid">{list.slice(0,8).map(p=><ProductCard p={p} key={p.id}/>)}</div></section>}
-function Listing({search=false}){const {slug}=useParams(),[params]=useSearchParams();const term=(search?params.get('q')||'':slug||'').toLowerCase();let list=products.filter(p=>p.name.toLowerCase().includes(term)||p.category.toLowerCase()===term);const [sort,setSort]=useState('new');if(sort==='price')list=[...list].sort((a,b)=>a.price-b.price);return <div className="listing"><aside><h3>Filters</h3><label>Price range</label><input type="range"/><h4>Brand</h4>{['Asus','HP','Dell','Lenovo','MSI','Gigabyte','Corsair','Samsung'].map(x=><label key={x}><input type="checkbox"/> {x}</label>)}<h4>Availability</h4><label><input type="checkbox"/> In stock</label></aside><main><p className="crumb">Home / {search?'Search':slug}</p><div className="section-title"><h1>{search?`Search results for “${params.get('q')||''}”`:slug}</h1><select value={sort} onChange={e=>setSort(e.target.value)}><option value="new">Newest</option><option value="price">Price: Low to High</option><option>Popular</option></select></div><div className="grid">{list.map(p=><ProductCard p={p} key={p.id}/>)}</div>{!list.length&&<div className="empty">No products found. Try another search.</div>}</main></div>}
-function Product(){const {slug}=useParams(),p=products.find(x=>x.slug===slug)||products[0],{dispatch}=useStore();return <><p className="crumb">Home / {p.category} / {p.name}</p><section className="detail"><div><img className="main-image" src={p.image}/><div className="thumbs"><img src={p.image}/><img src={p.image}/></div></div><div><small>{p.brand}</small><h1>{p.name}</h1><p className="rating">★★★★★ (12 reviews)</p><h2>{money(p.price)}</h2><p>{p.shortDescription}</p><p className={p.stock?'stock':'out'}>{p.stock?'● In Stock':'● Out of Stock'}</p><div className="buy"><button className="primary" onClick={()=>{dispatch({type:'ADD',p});toast.success('Added to cart')}}>Add to Cart</button><Link className="secondary" to="/checkout">Buy Now</Link><button onClick={()=>dispatch({type:'WISH',p})}><Heart/></button></div><div className="perks"><span><Truck/> Nationwide delivery</span><span><ShieldCheck/> Official warranty</span></div></div></section><section className="tabs"><h2>Full Specifications</h2><table><tbody>{[['Brand',p.brand],['Model',p.name],['Category',p.category],['Warranty','1 year official warranty']].map(x=><tr key={x[0]}><th>{x[0]}</th><td>{x[1]}</td></tr>)}</tbody></table><h2>Description</h2><p>{p.shortDescription}. Built for performance, reliable everyday use, and a great technology experience.</p><h2>Reviews</h2><div className="review">★★★★★ <b>Great product and quick delivery.</b></div></section><ProductSection title="Related Products" list={products.filter(x=>x.category===p.category&&x.id!==p.id)}/></>}
-function Cart(){const {cart,dispatch}=useStore();const total=cart.reduce((n,x)=>n+x.price*x.quantity,0);return <section className="cart-page"><h1>Shopping Cart</h1>{cart.length?<><div className="cart-table">{cart.map(x=><div className="cart-line" key={x.id}><img src={x.image}/><div><Link to={`/product/${x.slug}`}>{x.name}</Link><strong>{money(x.price)}</strong></div><div className="quantity"><button onClick={()=>dispatch({type:'QTY',id:x.id,q:x.quantity-1})}><Minus/></button>{x.quantity}<button onClick={()=>dispatch({type:'QTY',id:x.id,q:x.quantity+1})}><Plus/></button></div><b>{money(x.price*x.quantity)}</b><button onClick={()=>dispatch({type:'REMOVE',id:x.id})}><Trash2/></button></div>)}</div><OrderSummary total={total}/></>:<div className="empty"><ShoppingCart/><h2>Your cart is empty</h2><Link className="primary" to="/">Continue shopping</Link></div>}</section>}
-function OrderSummary({total}){const shipping=total>=5000?0:120;return <aside className="summary"><h3>Order Summary</h3><p>Subtotal <b>{money(total)}</b></p><p>Shipping <b>{shipping?'৳120':'Free'}</b></p><hr/><h2>Total <span>{money(total+shipping)}</span></h2><Link className="primary" to="/checkout">Proceed to Checkout</Link></aside>}
-function Checkout(){const {cart,dispatch}=useStore(),nav=useNavigate();const [step,setStep]=useState(1);const total=cart.reduce((n,x)=>n+x.price*x.quantity,0);const place=()=>{dispatch({type:'REMOVE',id:'never'}); localStorage.setItem('startech-store',JSON.stringify({cart:[],wishlist:useStore().wishlist}));toast.success('Order placed successfully');nav('/order-success')};return <section className="checkout"><h1>Checkout</h1><div className="steps"><b className={step>=1?'active':''}>1. Shipping</b><b className={step>=2?'active':''}>2. Payment</b><b className={step>=3?'active':''}>3. Review</b></div>{step===1&&<div className="form-card"><h2>Shipping address</h2>{['Full name','Phone','Email','Division','District','Thana','Address','Postal code','Order note'].map(x=><label key={x}>{x}<input placeholder={x}/></label>)}<button className="primary" onClick={()=>setStep(2)}>Continue</button></div>}{step===2&&<div className="form-card"><h2>Payment method</h2>{['Cash on Delivery','bKash','Nagad','Rocket','Card (SSLCommerz)','Bank transfer'].map(x=><label className="payment" key={x}><input type="radio" name="payment" defaultChecked={x==='Cash on Delivery'}/> {x}</label>)}<button className="primary" onClick={()=>setStep(3)}>Review Order</button></div>}{step===3&&<div className="form-card"><h2>Review your order</h2><p>{cart.length} item(s) · Total {money(total)}</p><button className="primary" onClick={place}>Place Order</button></div>}</section>}
-function Static({title}){return <section className="static"><h1>{title}</h1><p>StarTech Clone is committed to dependable technology products, transparent service, and a customer-first shopping experience across Bangladesh.</p></section>}
-function Account(){return <section className="account"><aside><User/><b>My Account</b>{['Profile','My Orders','Order Tracking','Addresses','Wishlist','Reviews','Notifications'].map(x=><button key={x}>{x}</button>)}<button>Logout</button></aside><main><h1>Profile</h1><div className="form-card"><label>Full name<input defaultValue="StarTech Customer"/></label><label>Email<input defaultValue="user@startech.local"/></label><button className="primary">Save changes</button></div></main></section>}
-function Wishlist(){const {wishlist}=useStore();return <section><h1>Wishlist</h1><div className="grid">{wishlist.map(p=><ProductCard p={p} key={p.id}/>)}</div>{!wishlist.length&&<div className="empty">Your wishlist is empty.</div>}</section>}
-function Admin(){const loc=useLocation();const isRoot=loc.pathname==='/admin';return <div className="admin"><aside><h2>StarTech Admin</h2>{[['Dashboard','/admin',LayoutDashboard],['Products','/admin/products',Package],['Categories','/admin/categories',Tag],['Orders','/admin/orders',ClipboardList],['Users','/admin/users',Users],['Inventory','/admin/inventory',Boxes],['Settings','/admin/settings',Settings]].map(([x,u,I])=><NavLink end={u==='/admin'} to={u} key={x}><I/>{x}</NavLink>)}</aside><main>{isRoot?<><h1>Dashboard</h1><div className="stats">{[['Total Sales','৳6,84,500'],['Orders Today','24'],['New Users','18'],['Low Stock','6']].map(x=><div key={x[0]}><small>{x[0]}</small><b>{x[1]}</b></div>)}</div><div className="admin-card"><h2>Recent orders</h2>{['ST-20260904-000123','ST-20260904-000122','ST-20260903-000121'].map(x=><p key={x}>{x}<span>Processing</span></p>)}</div></>:<AdminTable page={loc.pathname.split('/').pop()}/>}</main></div>}
-function AdminTable({page}){return <><div className="section-title"><h1>{page[0].toUpperCase()+page.slice(1)}</h1><button className="primary">Add new</button></div><div className="admin-card"><input placeholder="Search..."/><table><thead><tr><th>Name</th><th>Status</th><th>Action</th></tr></thead><tbody>{products.slice(0,6).map(p=><tr key={p.id}><td>{p.name}</td><td>Active</td><td><button>Edit</button></td></tr>)}</tbody></table></div></>}
-function Success(){return <div className="success"><ShieldCheck size={64}/><h1>Order confirmed!</h1><p>Your order number is <b>ST-20260904-000123</b>.</p><Link className="primary" to="/account">Track Order</Link></div>}
-function Footer(){return <footer><div><h2>StarTech Clone</h2><p>Bangladesh's reliable source for computers, components and accessories.</p></div>{[['Customer Care','Contact Us','FAQ','Warranty Policy','Return Policy'],['Information','About Us','Terms & Conditions','Privacy Policy','EMI Info']].map((a,i)=><div key={i}><h3>{a[0]}</h3>{a.slice(1).map(x=><Link to={`/${x.toLowerCase().replaceAll(' ','-').replace('&-','')}`} key={x}>{x}</Link>)}</div>)}<div><h3>Payments</h3><b>VISA · Mastercard · bKash · Nagad · Rocket</b></div></footer>}
-function App(){return <StoreProvider><Header/><div className="container"><Routes><Route path="/" element={<Home/>}/><Route path="/category/:slug" element={<Listing/>}/><Route path="/search" element={<Listing search/>}/><Route path="/product/:slug" element={<Product/>}/><Route path="/cart" element={<Cart/>}/><Route path="/checkout" element={<Checkout/>}/><Route path="/order-success" element={<Success/>}/><Route path="/wishlist" element={<Wishlist/>}/><Route path="/account" element={<Account/>}/><Route path="/admin/*" element={<Admin/>}/>{['about','contact','terms','privacy','return-policy','warranty-policy','faq','emi-info','login','register','forgot-password'].map(x=><Route path={`/${x}`} key={x} element={<Static title={x.replaceAll('-',' ').replace(/\b\w/g,c=>c.toUpperCase())}/>}/>)}</Routes></div><Footer/><Toaster position="top-right"/></StoreProvider>}
-createRoot(document.getElementById('root')).render(<BrowserRouter><App/></BrowserRouter>)
+import { AuthProvider } from './context/AuthContext'
+import { ShopProvider } from './context/ShopContext'
+
+import Header from './components/layout/Header'
+import Footer from './components/layout/Footer'
+
+// Eagerly import auth pages (small + used often)
+import { LoginPage, RegisterPage } from './pages/AuthPages'
+
+// Lazy load heavier pages
+const Home = lazy(() => import('./pages/Home'))
+const CategoryPage = lazy(() => import('./pages/CategoryPage'))
+const ProductDetail = lazy(() => import('./pages/ProductDetail'))
+const CartPage = lazy(() => import('./pages/CartPage'))
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
+const OrderSuccessPage = lazy(() => import('./pages/OrderSuccessPage'))
+const OrderTrackingPage = lazy(() => import('./pages/OrderTrackingPage'))
+const AccountPage = lazy(() => import('./pages/AccountPage'))
+const ComparePage = lazy(() => import('./pages/ComparePage'))
+const StaticPages = lazy(() => import('./pages/StaticPages'))
+
+// Admin pages
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'))
+
+function LoadingSpinner() {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '60vh',
+      flexDirection: 'column',
+      gap: 16,
+    }}>
+      <div className="loading-spinner" />
+      <span style={{ color: '#64748b', fontSize: 14 }}>Loading...</span>
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <ShopProvider>
+          <Header />
+          <main style={{ minHeight: '60vh' }}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/category/:slug" element={<CategoryPage />} />
+                <Route path="/search" element={<CategoryPage isSearch={true} />} />
+                <Route path="/product/:slug" element={<ProductDetail />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/order-success" element={<OrderSuccessPage />} />
+                <Route path="/order-tracking" element={<OrderTrackingPage />} />
+                <Route path="/compare" element={<ComparePage />} />
+
+                {/* Auth routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+
+                {/* User account */}
+                <Route path="/account/*" element={<AccountPage />} />
+
+                {/* Admin routes */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="products" element={<AdminProducts />} />
+                </Route>
+
+                {/* Static pages */}
+                <Route path="/about" element={<StaticPages page="about" />} />
+                <Route path="/contact" element={<StaticPages page="contact" />} />
+                <Route path="/privacy-policy" element={<StaticPages page="privacy" />} />
+                <Route path="/terms-conditions" element={<StaticPages page="terms" />} />
+                <Route path="/return-policy" element={<StaticPages page="return" />} />
+                <Route path="/warranty-policy" element={<StaticPages page="warranty" />} />
+                <Route path="/faq" element={<StaticPages page="faq" />} />
+                <Route path="/emi-info" element={<StaticPages page="emi" />} />
+
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </main>
+          <Footer />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#1e293b',
+                color: '#f1f5f9',
+                borderRadius: 8,
+                fontSize: 14,
+              },
+              success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
+              error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+            }}
+          />
+        </ShopProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  )
+}
+
+createRoot(document.getElementById('root')).render(<App />)

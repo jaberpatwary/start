@@ -46,6 +46,12 @@ func Register(e *echo.Echo, db *gorm.DB, uploadDir string) {
 	// Coupon validation (public)
 	v1.GET("/coupons/validate", catalogH.ValidateCoupon)
 
+	// Order tracking (public)
+	v1.GET("/orders/track/:number", orderH.TrackOrderByNumber)
+
+	// Public store settings
+	v1.GET("/settings", adminH.GetSettings)
+
 	// --- Protected User Routes ---
 	user := v1.Group("", mw.JWTAuth())
 
@@ -121,6 +127,13 @@ func Register(e *echo.Echo, db *gorm.DB, uploadDir string) {
 
 	// Admin: Inventory
 	admin.GET("/inventory", adminH.GetInventory)
+
+	// Admin: Reports
+	admin.GET("/reports", adminH.GetReports)
+
+	// Admin: Settings
+	admin.GET("/settings", adminH.GetSettings)
+	admin.PUT("/settings", adminH.UpdateSettings)
 
 	// Upload (admin only)
 	admin.POST("/upload", uploadH.UploadImage)
