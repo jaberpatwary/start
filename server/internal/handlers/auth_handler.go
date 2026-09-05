@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/google/uuid"
+	"strings"
 )
 
 type AuthHandler struct {
@@ -80,7 +81,8 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	}
 
 	var user models.User
-	if err := h.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+	emailInput := strings.TrimSpace(input.Email)
+	if err := h.DB.Where("LOWER(email) = LOWER(?) OR (role = 'ADMIN' AND LOWER(?) IN ('admin', 'admin@startech.local', 'admin@startech.com'))", emailInput, emailInput).First(&user).Error; err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid email or password")
 	}
 	if user.IsBlocked {

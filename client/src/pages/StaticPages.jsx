@@ -65,8 +65,8 @@ export function ContactPage() {
               <Mail color="#ef4a23" size={20} />
               <div>
                 <b>Email Support:</b>
-                <p>support@startech.local</p>
-                <p>corporate@startech.local</p>
+                <p>support@mitech.local</p>
+                <p>corporate@mitech.local</p>
               </div>
             </div>
 
@@ -137,10 +137,10 @@ export function TermsPage() {
       <div className="checkout-card">
         <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>Terms & Conditions</h1>
         <p style={{ fontSize: 14, lineHeight: 1.8, color: '#475569', marginBottom: 12 }}>
-          1. <b>Pricing and Availability:</b> All prices quoted on StarTech are in Bangladeshi Taka (BDT) including applicable VAT. Product availability is updated regularly.
+          1. <b>Pricing and Availability:</b> All prices quoted on MI-Tech are in Bangladeshi Taka (BDT) including applicable VAT. Product availability is updated regularly.
         </p>
         <p style={{ fontSize: 14, lineHeight: 1.8, color: '#475569', marginBottom: 12 }}>
-          2. <b>Order Confirmation:</b> Orders placed online will receive an automated order reference number. StarTech customer care verifies orders before shipping.
+          2. <b>Order Confirmation:</b> Orders placed online will receive an automated order reference number. MI-Tech customer care verifies orders before shipping.
         </p>
         <p style={{ fontSize: 14, lineHeight: 1.8, color: '#475569' }}>
           3. <b>Warranty Claims:</b> All branded warranty services are provided in accordance with the official distributor warranty policy.
@@ -159,7 +159,7 @@ export function WarrantyPolicyPage() {
           <ShieldCheck color="#10b981" size={24} />
           <div>
             <b>100% Official Brand Warranty</b>
-            <p style={{ fontSize: 13, color: '#64748b' }}>Every product sold at StarTech comes with full manufacturer warranty coverage.</p>
+            <p style={{ fontSize: 13, color: '#64748b' }}>Every product sold at MI-Tech comes with full manufacturer warranty coverage.</p>
           </div>
         </div>
         <p style={{ fontSize: 14, lineHeight: 1.8, color: '#475569', marginBottom: 12 }}>

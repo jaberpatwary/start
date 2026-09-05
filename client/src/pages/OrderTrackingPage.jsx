@@ -66,7 +66,7 @@ export default function OrderTrackingPage() {
         <ShieldCheck size={48} color="#ef4a23" style={{ margin: '0 auto 12px' }} />
         <h1 style={{ fontSize: 26, fontWeight: 800, color: '#0f172a' }}>Real-Time Order Tracking</h1>
         <p style={{ color: '#64748b', fontSize: 14 }}>
-          Enter your StarTech Order Number (e.g. ST-...) or courier tracking ID
+          Enter your MI-Tech Order Number (e.g. ST-...) or courier tracking ID
         </p>
       </div>
 

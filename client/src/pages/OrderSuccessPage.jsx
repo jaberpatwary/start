@@ -36,7 +36,7 @@ export default function OrderSuccessPage() {
         <CheckCircle2 size={56} color="#10b981" style={{ margin: '0 auto 12px' }} />
         <h1 style={{ fontSize: 26, fontWeight: 800, color: '#0f172a' }}>Thank You For Your Order!</h1>
         <p style={{ color: '#64748b', fontSize: 15 }}>
-          Your order has been placed successfully and is currently being processed by StarTech.
+          Your order has been placed successfully and is currently being processed by MI-Tech.
         </p>
       </div>
 
@@ -44,10 +44,13 @@ export default function OrderSuccessPage() {
       <div className="invoice-card">
         {/* Invoice Header */}
         <div className="invoice-header">
-          <div>
-            <h2 style={{ fontSize: 24, fontWeight: 800 }}>Star<span style={{ color: '#ef4a23' }}>Tech</span> Clone</h2>
-            <p style={{ fontSize: 12, color: '#64748b' }}>Star Tech & Engineering Ltd.</p>
-            <p style={{ fontSize: 12, color: '#64748b' }}>Hotline: 16793 | support@startech.local</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <img src="/logo.png" alt="MI-Tech" style={{ height: 48, width: 'auto', objectFit: 'contain' }} />
+            <div>
+              <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>MI-<span style={{ color: '#00C2FF' }}>Tech</span></h2>
+              <p style={{ fontSize: 12, color: '#64748b' }}>MI-Tech & Engineering Ltd.</p>
+              <p style={{ fontSize: 12, color: '#64748b' }}>Hotline: 16793 | support@mitech.local</p>
+            </div>
           </div>
           <div style={{ textAlign: 'right' }}>
             <h3 style={{ fontSize: 18, color: '#ef4a23', fontWeight: 800 }}>INVOICE</h3>

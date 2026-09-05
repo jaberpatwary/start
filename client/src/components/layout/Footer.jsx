@@ -9,22 +9,25 @@ export default function Footer() {
         <div className="footer-grid">
           {/* Col 1: Store info */}
           <div className="footer-col">
-            <h3 style={{ fontSize: 20, color: '#fff' }}>
-              Star<span style={{ color: '#ef4a23' }}>Tech</span> Clone
-            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <img src="/icon-dark.png" alt="MI-Tech" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
+              <h3 style={{ fontSize: 20, color: '#fff', margin: 0 }}>
+                MI-<span style={{ color: '#00C2FF' }}>Tech</span>
+              </h3>
+            </div>
             <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
-              Star Tech & Engineering Ltd. is Bangladesh’s largest computer and tech retail shop.
-              Providing 100% genuine products, official warranties, and fast nationwide delivery since 2007.
+              MI-Tech & Engineering Ltd. is Bangladesh’s premier computer and tech retail store.
+              Providing 100% genuine products, official warranties, and fast nationwide delivery.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Phone size={14} color="#ef4a23" /> Hotline: <b>16793</b> / <b>09612316793</b>
+                <Phone size={14} color="#00C2FF" /> Hotline: <b>16793</b> / <b>09612316793</b>
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Mail size={14} color="#ef4a23" /> support@startech.local
+                <Mail size={14} color="#00C2FF" /> support@mitech.local
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <MapPin size={14} color="#ef4a23" /> Head Office: 28 Kazi Nazrul Islam Ave, Dhaka 1000
+                <MapPin size={14} color="#00C2FF" /> Head Office: 28 Kazi Nazrul Islam Ave, Dhaka 1000
               </span>
             </div>
           </div>
@@ -89,7 +92,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="footer-bottom">
-          <p>© 2026 Star Tech Clone Ltd. | All Rights Reserved. Built for Pairs & Pair Programming.</p>
+          <p>© 2026 MI-Tech Ltd. | All Rights Reserved. Bangladesh's Leading Computer Hardware & Technology Store.</p>
           <p>Powered by Golang Echo + GORM + PostgreSQL + React Vite</p>
         </div>
       </div>

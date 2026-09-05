@@ -40,18 +40,19 @@ export function LoginPage() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
       }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <img src="/logo.png" alt="MI-Tech" style={{ height: 65, width: 'auto', marginBottom: 12, objectFit: 'contain' }} />
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a' }}>Account Login</h1>
-          <p style={{ fontSize: 13, color: '#64748b' }}>Please login to your StarTech account</p>
+          <p style={{ fontSize: 13, color: '#64748b' }}>Please login to your MI-Tech account</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="form-group">
-            <label>Email Address</label>
+            <label>Email Address or Username</label>
             <div style={{ position: 'relative' }}>
               <input
-                type="email"
+                type="text"
                 required
-                placeholder="user@startech.local"
+                placeholder="admin or email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -79,12 +80,12 @@ export function LoginPage() {
             color: '#475569',
           }}>
             <b style={{ color: '#0f172a', display: 'block', marginBottom: 4 }}>Demo Admin Credentials:</b>
-            <span>admin@startech.local / Admin@123</span>
+            <span>admin / admin123</span>
             <button
               type="button"
               onClick={() => {
-                setEmail('admin@startech.local')
-                setPassword('Admin@123')
+                setEmail('admin')
+                setPassword('admin123')
               }}
               style={{
                 display: 'block',
@@ -171,8 +172,9 @@ export function RegisterPage() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
       }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <img src="/logo.png" alt="MI-Tech" style={{ height: 65, width: 'auto', marginBottom: 12, objectFit: 'contain' }} />
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a' }}>Register Account</h1>
-          <p style={{ fontSize: 13, color: '#64748b' }}>Create a new account for fast orders and tracking</p>
+          <p style={{ fontSize: 13, color: '#64748b' }}>Create a new MI-Tech account for fast orders and tracking</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

@@ -25,8 +25,9 @@ export default function AdminLayout() {
     <div className="admin-layout">
       {/* Sidebar */}
       <aside className="admin-sidebar">
-        <div className="admin-brand">
-          Star<span>Tech</span> Admin
+        <div className="admin-brand" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img src="/icon-dark.png" alt="MI-Tech" style={{ height: 30, width: 'auto', objectFit: 'contain' }} />
+          <span>MI-<span style={{ color: '#00C2FF' }}>Tech</span> Admin</span>
         </div>
 
         <nav className="admin-menu">

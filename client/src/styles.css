@@ -183,14 +183,23 @@ img {
 .logo {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 26px;
-  font-weight: 800;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 900;
   letter-spacing: -0.5px;
   color: #fff;
 }
+.logo img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+.logo:hover img {
+  transform: scale(1.05);
+}
 .logo span {
-  color: var(--primary);
+  color: #00C2FF;
 }
 .logo-badge {
   font-size: 10px;
@@ -1468,13 +1477,21 @@ img {
 }
 .admin-brand {
   padding: 20px;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
   color: #fff;
   border-bottom: 1px solid #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.admin-brand span {
-  color: var(--primary);
+.admin-brand img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+.admin-brand span span {
+  color: #00C2FF;
 }
 .admin-menu {
   flex: 1;
