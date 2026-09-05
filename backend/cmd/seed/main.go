@@ -9,9 +9,7 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		_ = godotenv.Load("../.env")
-	}
+	_ = godotenv.Load(".env", "../.env", "../../.env")
 
 	cfg, err := config.Load()
 	if err != nil {

@@ -15,10 +15,8 @@ import (
 )
 
 func main() {
-	// Load .env from current dir or parent
-	if err := godotenv.Load(); err != nil {
-		_ = godotenv.Load("../.env")
-	}
+	// Load .env from current dir or parent directories
+	_ = godotenv.Load(".env", "../.env", "../../.env")
 
 	cfg, err := config.Load()
 	if err != nil {
