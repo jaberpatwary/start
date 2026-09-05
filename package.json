@@ -3,12 +3,16 @@
   "private": true,
   "scripts": {
     "start": "npm run dev",
-    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
-    "dev:client": "npm --prefix client run dev",
-    "dev:server": "cd server && go run ./cmd/api",
-    "seed": "cd server && go run ./cmd/seed",
-    "build:client": "npm --prefix client run build",
-    "build:server": "cd server && go build -o bin/api ./cmd/api"
+    "dev": "concurrently \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "cd backend && go run ./cmd/api",
+    "dev:client": "npm --prefix frontend run dev",
+    "dev:server": "cd backend && go run ./cmd/api",
+    "seed": "cd backend && go run ./cmd/seed",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "cd backend && go build -o bin/api ./cmd/api",
+    "build:client": "npm --prefix frontend run build",
+    "build:server": "cd backend && go build -o bin/api ./cmd/api"
   },
   "devDependencies": { "concurrently": "^8.2.2" }
 }

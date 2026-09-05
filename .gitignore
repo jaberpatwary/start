@@ -4,8 +4,9 @@ vendor/
 
 # Binaries & Executables
 bin/
+dist/
 *.exe
-*.exe;
+*.exe~
 *.dll
 *.so
 *.dylib
@@ -13,10 +14,12 @@ bin/
 # Environment & Credentials
 .env
 .env.local
+backend/.env
 server/.env
 
 # Logs
 *.log
+backend.log
 server.log
 
 # System & IDE
