@@ -67,8 +67,9 @@ func (r *Router) Register(e *echo.Echo) {
 	v1 := e.Group("/api/v1")
 
 	// --- Public Routes ---
-	v1.POST("/auth/register", r.authHandler.Register)
-	v1.POST("/auth/login", r.authHandler.Login)
+	authLimiter := mw.AuthRateLimit()
+	v1.POST("/auth/register", r.authHandler.Register, authLimiter)
+	v1.POST("/auth/login", r.authHandler.Login, authLimiter)
 	v1.POST("/auth/logout", r.authHandler.Logout)
 
 	// Products (public)

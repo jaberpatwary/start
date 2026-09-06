@@ -2,7 +2,7 @@ ifeq ($(OS),Windows_NT)
   export PATH := $(PATH);C:\Program Files\nodejs;C:\Program Files\Go\bin
 endif
 
-.PHONY: start dev server backend client frontend seed build tidy test help
+.PHONY: start dev server backend client frontend seed build tidy test prod-build prod-up prod-down prod-logs prod-restart backup help
 
 # Run both backend (:8090) and frontend (:8888) concurrently
 start:
@@ -40,11 +40,39 @@ tidy:
 test:
 	cd backend && go test ./...
 
+# ─── Production Docker Commands ────────────────────────────────────────────
+prod-build:
+	docker compose build
+
+prod-up:
+	docker compose up -d
+
+prod-down:
+	docker compose down
+
+prod-logs:
+	docker compose logs -f
+
+prod-restart:
+	docker compose restart
+
+prod-ps:
+	docker compose ps
+
+backup:
+	bash scripts/backup-db.sh
+
 help:
 	@echo StarTech Commands:
-	@echo   make start    - Run Backend (:8090) and Frontend (:8888) together
-	@echo   make dev      - Run Backend and Frontend together
-	@echo   make backend  - Run Go Echo backend only (:8090)
-	@echo   make frontend - Run React Vite frontend only (:8888)
-	@echo   make seed     - Seed initial data into PostgreSQL
-	@echo   make build    - Build backend binary and frontend bundle
+	@echo   make start        - Run Backend (:8090) and Frontend (:8888) together
+	@echo   make dev          - Run Backend and Frontend together
+	@echo   make backend      - Run Go Echo backend only (:8090)
+	@echo   make frontend     - Run React Vite frontend only (:8888)
+	@echo   make seed         - Seed initial data into PostgreSQL
+	@echo   make build        - Build backend binary and frontend bundle locally
+	@echo   make test         - Run backend tests
+	@echo   make prod-build   - Build production Docker containers
+	@echo   make prod-up      - Start production stack with Docker Compose
+	@echo   make prod-down    - Stop production stack
+	@echo   make prod-logs    - Follow production container logs
+	@echo   make backup       - Run database backup script

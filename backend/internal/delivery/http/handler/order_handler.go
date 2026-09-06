@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/jaberpatwary/startech/internal/domain"
 	"github.com/jaberpatwary/startech/internal/usecase"
 	"github.com/labstack/echo/v4"
 )
@@ -92,10 +93,19 @@ func (h *OrderHandler) GetMyOrders(c echo.Context) error {
 
 func (h *OrderHandler) GetOrderByID(c echo.Context) error {
 	id := c.Param("id")
+	userID, _ := c.Get("user_id").(string)
+	role, _ := c.Get("role").(string)
+
 	order, err := h.orderUsecase.GetOrderByID(c.Request().Context(), id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "Order not found")
 	}
+
+	// IDOR Protection: User can only view their own order unless they are an admin
+	if role != domain.RoleAdmin && order.UserID != userID {
+		return echo.NewHTTPError(http.StatusForbidden, "You do not have permission to view this order")
+	}
+
 	return c.JSON(http.StatusOK, echo.Map{"code": 200, "status": "success", "order": order})
 }
 

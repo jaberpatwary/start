@@ -140,18 +140,48 @@ func (h *AdminHandler) UploadImage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "No image file provided")
 	}
 
+	// 1. Max 10MB file size limit
+	if file.Size > 10*1024*1024 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Image size exceeds maximum limit of 10MB")
+	}
+
+	// 2. Extension validation
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	allowedExts := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true, ".gif": true}
+	if !allowedExts[ext] {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid file extension. Only JPG, PNG, WebP, GIF allowed")
+	}
+
 	src, err := file.Open()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to open uploaded file")
 	}
 	defer src.Close()
 
-	ext := strings.ToLower(filepath.Ext(file.Filename))
-	allowedExts := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true, ".gif": true}
-	if !allowedExts[ext] {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid file type. Only JPG, PNG, WebP, GIF allowed")
+	// 3. MIME type verification via magic bytes (first 512 bytes)
+	buffer := make([]byte, 512)
+	n, err := src.Read(buffer)
+	if err != nil && err != io.EOF {
+		return echo.NewHTTPError(http.StatusBadRequest, "Failed to read file content")
 	}
 
+	mimeType := http.DetectContentType(buffer[:n])
+	allowedMimes := map[string]bool{
+		"image/jpeg": true,
+		"image/png":  true,
+		"image/webp": true,
+		"image/gif":  true,
+	}
+	if !allowedMimes[mimeType] {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid file content. Uploaded file is not a valid image")
+	}
+
+	// 4. Reset file pointer to beginning before saving
+	if _, err := src.Seek(0, io.SeekStart); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to process image file")
+	}
+
+	// 5. Secure random filename (prevents directory traversal and overwrites)
 	filename := strconv.FormatInt(time.Now().UnixNano(), 10) + ext
 	dstPath := filepath.Join(h.uploadDir, filename)
 

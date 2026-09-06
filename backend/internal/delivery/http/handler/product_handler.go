@@ -4,6 +4,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/jaberpatwary/startech/internal/domain"
 	"github.com/jaberpatwary/startech/internal/usecase"
@@ -208,7 +209,16 @@ func (h *ProductHandler) AddReview(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
 	}
 
-	if err := h.productUsecase.CreateReview(c.Request().Context(), userID, productID, req.Rating, req.Comment); err != nil {
+	if req.Rating < 1 || req.Rating > 5 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Rating must be between 1 and 5 stars")
+	}
+
+	cleanComment := strings.TrimSpace(req.Comment)
+	if len(cleanComment) > 1000 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Comment cannot exceed 1000 characters")
+	}
+
+	if err := h.productUsecase.CreateReview(c.Request().Context(), userID, productID, req.Rating, cleanComment); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to submit review")
 	}
 

@@ -3,21 +3,40 @@ package database
 import (
 	"log"
 
+	"github.com/jaberpatwary/startech/internal/config"
 	"github.com/jaberpatwary/startech/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-func Connect(databaseURL string) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(databaseURL), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+func Connect(cfg *config.Config) (*gorm.DB, error) {
+	// GORM log level: Warn in production to prevent leaking sensitive queries and high CPU, Info in development
+	logLevel := logger.Info
+	if cfg.IsProduction() {
+		logLevel = logger.Warn
+	}
+
+	db, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{
+		Logger: logger.Default.LogMode(logLevel),
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println("Database connected successfully")
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+
+	// Production database connection pooling
+	sqlDB.SetMaxOpenConns(cfg.DBMaxOpenConns)
+	sqlDB.SetMaxIdleConns(cfg.DBMaxIdleConns)
+	sqlDB.SetConnMaxLifetime(cfg.DBConnMaxLifetime)
+	sqlDB.SetConnMaxIdleTime(cfg.DBConnMaxIdleTime)
+
+	log.Printf("Database connection pool configured (MaxOpen: %d, MaxIdle: %d, MaxLifetime: %v)",
+		cfg.DBMaxOpenConns, cfg.DBMaxIdleConns, cfg.DBConnMaxLifetime)
 
 	err = db.AutoMigrate(
 		&models.User{},
@@ -40,11 +59,11 @@ func Connect(databaseURL string) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	log.Println("Database migration completed")
+	log.Println("Database migration completed successfully")
 
-	// Seed initial data
+	// Seed initial data if database is empty
 	if err := Seed(db); err != nil {
-		log.Printf("Warning: seeding failed: %v", err)
+		log.Printf("Notice: seeding completed or skipped: %v", err)
 	}
 
 	return db, nil

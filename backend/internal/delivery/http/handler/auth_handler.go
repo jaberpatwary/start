@@ -2,6 +2,8 @@ package handler
 
 import (
 	"net/http"
+	"net/mail"
+	"strings"
 
 	"github.com/jaberpatwary/startech/internal/domain"
 	"github.com/jaberpatwary/startech/internal/usecase"
@@ -40,7 +42,29 @@ func (h *AuthHandler) Register(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
 	}
 
-	user, token, err := h.authUsecase.Register(c.Request().Context(), req.Name, req.Email, req.Password, req.Phone)
+	cleanName := strings.TrimSpace(req.Name)
+	cleanEmail := strings.ToLower(strings.TrimSpace(req.Email))
+	cleanPhone := strings.TrimSpace(req.Phone)
+
+	if cleanName == "" || len(cleanName) < 2 || len(cleanName) > 100 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Name must be between 2 and 100 characters")
+	}
+
+	if cleanEmail == "" || len(cleanEmail) > 100 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Valid email address is required")
+	}
+	if _, err := mail.ParseAddress(cleanEmail); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid email address format")
+	}
+
+	if len(req.Password) < 6 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Password must be at least 6 characters long")
+	}
+	if len(req.Password) > 72 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Password cannot exceed 72 characters")
+	}
+
+	user, token, err := h.authUsecase.Register(c.Request().Context(), cleanName, cleanEmail, req.Password, cleanPhone)
 	if err != nil {
 		if err == domain.ErrAlreadyExists {
 			return echo.NewHTTPError(http.StatusConflict, "User with this email already exists")
@@ -52,7 +76,7 @@ func (h *AuthHandler) Register(c echo.Context) error {
 		Name:     "auth_token",
 		Value:    token,
 		Path:     "/",
-		HttpOnly: false,
+		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
 
@@ -71,7 +95,15 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
 	}
 
-	user, token, err := h.authUsecase.Login(c.Request().Context(), req.Email, req.Password)
+	cleanEmail := strings.ToLower(strings.TrimSpace(req.Email))
+	if cleanEmail == "" || req.Password == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Email and password are required")
+	}
+	if len(req.Password) > 72 {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid email or password")
+	}
+
+	user, token, err := h.authUsecase.Login(c.Request().Context(), cleanEmail, req.Password)
 	if err != nil {
 		if err == domain.ErrAccountBlocked {
 			return echo.NewHTTPError(http.StatusForbidden, "Account is blocked")
@@ -83,7 +115,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		Name:     "auth_token",
 		Value:    token,
 		Path:     "/",
-		HttpOnly: false,
+		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
 
@@ -130,7 +162,12 @@ func (h *AuthHandler) UpdateProfile(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request body")
 	}
 
-	user, err := h.authUsecase.UpdateProfile(c.Request().Context(), userID, req.Name, req.Phone, req.Avatar)
+	cleanName := strings.TrimSpace(req.Name)
+	if cleanName == "" || len(cleanName) < 2 || len(cleanName) > 100 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Name must be between 2 and 100 characters")
+	}
+
+	user, err := h.authUsecase.UpdateProfile(c.Request().Context(), userID, cleanName, strings.TrimSpace(req.Phone), strings.TrimSpace(req.Avatar))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update profile")
 	}

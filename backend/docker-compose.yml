@@ -1,21 +1,25 @@
-version: '3.8'
-
 services:
-  app:
+  backend:
     build: .
+    container_name: mitech-backend-standalone
     ports:
-      - "8080:8080"
+      - "8090:8090"
     environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=root
-      - DB_NAME=start
+      - PORT=8090
+      - APP_ENV=production
+      - DATABASE_URL=postgres://postgres:root@postgres:5432/start?sslmode=disable
+      - JWT_SECRET=startech_secret_key_2026
+      - CLIENT_URL=http://localhost:8888
+      - UPLOAD_DIR=/app/uploads
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    volumes:
+      - backend_uploads:/app/uploads
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
+    container_name: mitech-postgres-standalone
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -23,8 +27,14 @@ services:
       POSTGRES_DB: start
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d start"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:
+  backend_uploads:

@@ -1,0 +1,80 @@
+services:
+  # ─── Database ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: mitech-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-start}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_secure_pass_2026}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-start}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    ports:
+      - "127.0.0.1:5432:5432"
+    networks:
+      - mitech-network
+
+  # ─── Go Echo Backend ──────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mitech-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: "8090"
+      APP_ENV: ${APP_ENV:-production}
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_secure_pass_2026}@postgres:5432/${POSTGRES_DB:-start}?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-mi_tech_super_secret_jwt_key_2026_change_in_production}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost}
+      UPLOAD_DIR: /app/uploads
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost,http://127.0.0.1}
+    volumes:
+      - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8090/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    ports:
+      - "127.0.0.1:8090:8090"
+    networks:
+      - mitech-network
+
+  # ─── React Frontend + Nginx Reverse Proxy ──────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mitech-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    networks:
+      - mitech-network
+
+volumes:
+  postgres_data:
+    name: mitech_postgres_data
+  uploads_data:
+    name: mitech_uploads_data
+
+networks:
+  mitech-network:
+    name: mitech_network
+    driver: bridge
