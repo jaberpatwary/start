@@ -10,24 +10,24 @@ export default function Footer() {
           {/* Col 1: Store info */}
           <div className="footer-col">
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <img src="/icon-dark.png" alt="MI-Tech" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
+              <img src="/logo-dark.png" alt="MI-Tech" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
               <h3 style={{ fontSize: 20, color: '#fff', margin: 0 }}>
-                MI-<span style={{ color: '#00C2FF' }}>Tech</span>
+                MI-<span style={{ color: '#ef4a23' }}>Tech</span>
               </h3>
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
-              MI-Tech & Engineering Ltd. is Bangladesh’s premier computer and tech retail store.
+              MI-Tech & Engineering Ltd. is Bangladesh's premier computer and tech retail store.
               Providing 100% genuine products, official warranties, and fast nationwide delivery.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Phone size={14} color="#00C2FF" /> Hotline: <b>16793</b> / <b>09612316793</b>
+                <Phone size={14} color="#ef4a23" /> Hotline: <b>16793</b> / <b>09612316793</b>
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Mail size={14} color="#00C2FF" /> support@mitech.local
+                <Mail size={14} color="#ef4a23" /> support@mitech.local
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <MapPin size={14} color="#00C2FF" /> Head Office: 28 Kazi Nazrul Islam Ave, Dhaka 1000
+                <MapPin size={14} color="#ef4a23" /> Head Office: 28 Kazi Nazrul Islam Ave, Dhaka 1000
               </span>
             </div>
           </div>

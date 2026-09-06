@@ -47,7 +47,7 @@ export default function OrderSuccessPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <img src="/logo.png" alt="MI-Tech" style={{ height: 48, width: 'auto', objectFit: 'contain' }} />
             <div>
-              <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>MI-<span style={{ color: '#00C2FF' }}>Tech</span></h2>
+              <h2 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>MI-<span style={{ color: '#ef4a23' }}>Tech</span></h2>
               <p style={{ fontSize: 12, color: '#64748b' }}>MI-Tech & Engineering Ltd.</p>
               <p style={{ fontSize: 12, color: '#64748b' }}>Hotline: 16793 | support@mitech.local</p>
             </div>

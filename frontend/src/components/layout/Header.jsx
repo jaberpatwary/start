@@ -77,9 +77,9 @@ export default function Header() {
         <div className="container">
           {/* Logo */}
           <Link to="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <img src="/icon-dark.png" alt="MI-Tech" style={{ height: 38, width: 'auto', objectFit: 'contain' }} />
+            <img src="/logo-dark.png" alt="MI-Tech" style={{ height: 42, width: 'auto', objectFit: 'contain' }} />
             <span style={{ fontSize: 24, fontWeight: 900, letterSpacing: '-0.5px', color: '#fff', display: 'flex', alignItems: 'center' }}>
-              MI-<span style={{ color: '#00C2FF' }}>Tech</span>
+              MI-<span style={{ color: '#ef4a23' }}>Tech</span>
             </span>
           </Link>
 

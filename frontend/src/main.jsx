@@ -29,6 +29,12 @@ const StaticPages = lazy(() => import('./pages/StaticPages'))
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'))
+const AdminCatalog = lazy(() => import('./pages/admin/AdminCatalog'))
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'))
+const AdminUsersReviews = lazy(() => import('./pages/admin/AdminUsersReviews'))
+const AdminInventory = lazy(() => import('./pages/admin/AdminInventory'))
+const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'))
 
 function LoadingSpinner() {
   return (
@@ -77,6 +83,12 @@ function App() {
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="products" element={<AdminProducts />} />
+                  <Route path="catalog" element={<AdminCatalog />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="users-reviews" element={<AdminUsersReviews />} />
+                  <Route path="inventory" element={<AdminInventory />} />
+                  <Route path="reports" element={<AdminReports />} />
+                  <Route path="settings" element={<AdminSettings />} />
                 </Route>
 
                 {/* Static pages */}

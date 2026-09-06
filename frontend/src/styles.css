@@ -199,7 +199,7 @@ img {
   transform: scale(1.05);
 }
 .logo span {
-  color: #00C2FF;
+  color: #ef4a23;
 }
 .logo-badge {
   font-size: 10px;
@@ -1491,7 +1491,7 @@ img {
   object-fit: contain;
 }
 .admin-brand span span {
-  color: #00C2FF;
+  color: #ef4a23;
 }
 .admin-menu {
   flex: 1;
